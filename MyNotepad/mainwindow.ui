@@ -72,7 +72,7 @@
     <addaction name="actionReplace"/>
     <addaction name="actionFont"/>
     <addaction name="actionShowLineNumber"/>
-    <addaction name="actioLine"/>
+    <addaction name="actionLine"/>
    </widget>
    <widget class="QMenu" name="menu_V">
     <property name="title">
@@ -120,7 +120,7 @@
    <addaction name="separator"/>
    <addaction name="actionFont"/>
    <addaction name="actionShowLineNumber"/>
-   <addaction name="actioLine"/>
+   <addaction name="actionLine"/>
    <addaction name="separator"/>
    <addaction name="actionShowToolBar"/>
    <addaction name="actionShowStatusBar"/>
@@ -310,7 +310,7 @@
     <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
-  <action name="actioLine">
+  <action name="actionLine">
    <property name="icon">
     <iconset theme="QIcon::ThemeIcon::InsertLink"/>
    </property>

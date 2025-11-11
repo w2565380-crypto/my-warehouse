@@ -8,6 +8,7 @@
 #include "QTextStream"
 #include <QFontDialog>
 #include <QScrollBar>
+#include "codeeditor.h"
 
 
 
@@ -16,6 +17,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // --- 新增：使用 CodeEditor 替换 textEdit ---
+    CodeEditor *editor = new CodeEditor(this);
+    editor->setFont(QFont("Consolas", 11));
+    ui->verticalLayout->replaceWidget(ui->textEdit, editor);
+    delete ui->textEdit;
+    ui->textEdit = editor;
+    // ----------------------------------------
 
     textChanged = false;
     filePath = "";
@@ -32,11 +41,11 @@ MainWindow::MainWindow(QWidget *parent)
     QLabel *author = new QLabel(tr("翁圳欣"), ui->statusbar);
     ui->statusbar->addPermanentWidget(author);
 
-    // 连接 QPlainTextEdit 的信号
     connect(ui->textEdit, &QPlainTextEdit::cursorPositionChanged,
             this, &MainWindow::on_cursorPositionChanged);
 
-    updateStatusBar();  // 初始化状态栏
+
+    updateStatusBar();
 }
 
 
@@ -271,14 +280,21 @@ void MainWindow::on_actionFont_triggered()
 
 void MainWindow::on_actionShowLineNumber_triggered()
 {
-    // 显示行数（这里实现为在状态栏显示当前行数）
-    QMessageBox::information(this, "行数信息",
-                             QString("当前文档共有 %1 行").arg(ui->textEdit->blockCount()));
+    CodeEditor *editor = qobject_cast<CodeEditor *>(ui->textEdit);
+    if (!editor) return;
+
+    bool currentlyVisible = editor->isLineNumberVisible();
+    editor->setLineNumberVisible(!currentlyVisible);
+
+    if (currentlyVisible) {
+        QMessageBox::information(this, "行号隐藏", "已隐藏左侧行号显示。");
+    } else {
+        QMessageBox::information(this, "行号显示", "已显示左侧行号。");
+    }
 }
 
 void MainWindow::on_actionLine_triggered()
 {
-    // 显示/隐藏行号（这里用消息框显示当前行）
     QTextCursor cursor = ui->textEdit->textCursor();
     int line = cursor.blockNumber() + 1;
     QMessageBox::information(this, "行号信息",

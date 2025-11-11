@@ -10,7 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     aboutdialog.cpp \
-    linenumberarea.cpp \
+    codeeditor.cpp \
     main.cpp \
     mainwindow.cpp \
     replacedialog.cpp \
@@ -18,7 +18,7 @@ SOURCES += \
 
 HEADERS += \
     aboutdialog.h \
-    linenumberarea.h \
+    codeeditor.h \
     mainwindow.h \
     replacedialog.h \
     searchdialog.h

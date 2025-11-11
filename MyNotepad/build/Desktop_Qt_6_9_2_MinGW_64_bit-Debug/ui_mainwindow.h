@@ -39,7 +39,7 @@ public:
     QAction *actionReplace;
     QAction *actionFont;
     QAction *actionShowLineNumber;
-    QAction *actioLine;
+    QAction *actionLine;
     QAction *actionShowToolBar;
     QAction *actionShowStatusBar;
     QAction *actionRedo;
@@ -126,11 +126,11 @@ public:
         QIcon icon12(QIcon::fromTheme(QIcon::ThemeIcon::FormatJustifyCenter));
         actionShowLineNumber->setIcon(icon12);
         actionShowLineNumber->setMenuRole(QAction::MenuRole::NoRole);
-        actioLine = new QAction(MainWindow);
-        actioLine->setObjectName("actioLine");
+        actionLine = new QAction(MainWindow);
+        actionLine->setObjectName("actionLine");
         QIcon icon13(QIcon::fromTheme(QIcon::ThemeIcon::InsertLink));
-        actioLine->setIcon(icon13);
-        actioLine->setMenuRole(QAction::MenuRole::NoRole);
+        actionLine->setIcon(icon13);
+        actionLine->setMenuRole(QAction::MenuRole::NoRole);
         actionShowToolBar = new QAction(MainWindow);
         actionShowToolBar->setObjectName("actionShowToolBar");
         QIcon icon14(QIcon::fromTheme(QIcon::ThemeIcon::DocumentProperties));
@@ -201,7 +201,7 @@ public:
         menu_O->addAction(actionReplace);
         menu_O->addAction(actionFont);
         menu_O->addAction(actionShowLineNumber);
-        menu_O->addAction(actioLine);
+        menu_O->addAction(actionLine);
         menu_V->addAction(actionShowToolBar);
         menu_V->addAction(actionShowStatusBar);
         menu_H->addAction(actionAbout);
@@ -221,7 +221,7 @@ public:
         toolBar->addSeparator();
         toolBar->addAction(actionFont);
         toolBar->addAction(actionShowLineNumber);
-        toolBar->addAction(actioLine);
+        toolBar->addAction(actionLine);
         toolBar->addSeparator();
         toolBar->addAction(actionShowToolBar);
         toolBar->addAction(actionShowStatusBar);
@@ -289,9 +289,9 @@ public:
 #if QT_CONFIG(shortcut)
         actionShowLineNumber->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+N", nullptr));
 #endif // QT_CONFIG(shortcut)
-        actioLine->setText(QCoreApplication::translate("MainWindow", "\346\230\276\347\244\272\350\241\214\345\217\267(&H)", nullptr));
+        actionLine->setText(QCoreApplication::translate("MainWindow", "\346\230\276\347\244\272\350\241\214\345\217\267(&H)", nullptr));
 #if QT_CONFIG(shortcut)
-        actioLine->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+H", nullptr));
+        actionLine->setShortcut(QCoreApplication::translate("MainWindow", "Ctrl+H", nullptr));
 #endif // QT_CONFIG(shortcut)
         actionShowToolBar->setText(QCoreApplication::translate("MainWindow", "\346\237\245\347\234\213\345\267\245\345\205\267\346\240\217(&Y)", nullptr));
 #if QT_CONFIG(shortcut)
