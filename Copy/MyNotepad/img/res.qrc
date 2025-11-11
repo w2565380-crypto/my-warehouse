@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>res.qrc</file>
+        <file>生成记事本图标.png</file>
+    </qresource>
+</RCC>
