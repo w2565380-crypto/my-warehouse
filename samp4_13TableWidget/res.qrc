@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <RCC>
     <qresource prefix="/images">
         <file>icons/yes.bmp</file>
@@ -6,3 +7,13 @@
         <file>icons/boy.ico</file>
     </qresource>
 </RCC>
+=======
+<RCC>
+    <qresource prefix="/images">
+        <file>icons/yes.bmp</file>
+        <file>icons/no.bmp</file>
+        <file>icons/girl.ico</file>
+        <file>icons/boy.ico</file>
+    </qresource>
+</RCC>
+>>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4

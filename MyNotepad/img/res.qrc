@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 <RCC>
     <qresource prefix="/">
         <file>res.qrc</file>
         <file>生成记事本图标.png</file>
     </qresource>
 </RCC>
+=======
+<RCC>
+    <qresource prefix="/">
+        <file>res.qrc</file>
+        <file>生成记事本图标.png</file>
+    </qresource>
+</RCC>
+>>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4

@@ -1,4 +1,11 @@
+<<<<<<< HEAD
 #ifndef LINENUMBERAREA_H
 #define LINENUMBERAREA_H
 
 #endif // LINENUMBERAREA_H
+=======
+#ifndef LINENUMBERAREA_H
+#define LINENUMBERAREA_H
+
+#endif // LINENUMBERAREA_H
+>>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4

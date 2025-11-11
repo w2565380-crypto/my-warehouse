@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -56,3 +57,63 @@ private:
     bool saveFile(const QString &filePath);
 };
 #endif // MAINWINDOW_H
+=======
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
+
+#include <QLabel>
+#include <QMainWindow>
+#include <QPlainTextEdit>
+
+QT_BEGIN_NAMESPACE
+namespace Ui {
+class MainWindow;
+}
+QT_END_NAMESPACE
+
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
+
+private slots:
+    void on_actionAbout_triggered();
+    void on_actionFind_triggered();
+    void on_actionReplace_triggered();
+    void on_actionNew_triggered();
+    void on_actionOpen_triggered();
+    void on_actionSave_triggered();
+    void on_actionSaveAs_triggered();
+    void on_actionExit_triggered();
+    void on_actionUndo_triggered();
+    void on_actionRedo_triggered();
+    void on_actionCut_triggered();
+    void on_actionCopy_triggered();
+    void on_actionPaste_triggered();
+    void on_actionFont_triggered();
+    void on_actionShowLineNumber_triggered();  // 修正：使用正确的action名称
+    void on_actionLine_triggered();
+    void on_actionShowToolBar_triggered();     // 修正：使用正确的action名称
+    void on_actionShowStatusBar_triggered();   // 修正：使用正确的action名称
+    void on_textEdit_textChanged();
+    void on_cursorPositionChanged();
+
+
+private:
+    Ui::MainWindow *ui;
+    QLabel statusCursorLabel;
+    QLabel statusLabel;
+    QString filePath;
+    bool textChanged;
+    QString originalWindowTitle;
+
+    bool userEditConfirmed();
+    void updateStatusBar();
+    void updateWindowTitle();
+    bool saveFile(const QString &filePath);
+};
+#endif // MAINWINDOW_H
+>>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4
