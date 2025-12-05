@@ -7,6 +7,9 @@ MasterView::MasterView(QWidget *parent)
     , ui(new Ui::MasterView)
 {
     ui->setupUi(this);
+
+    this->setWindowFlag(Qt::FramelessWindowHint);
+
     goLoginView();
 }
 
@@ -29,6 +32,9 @@ void MasterView::goWelcomeView()
     qDebug()<<"goWelcomeView";
     welcomeView=new WelcomeView(this);
     pushWidgetToStackView(welcomeView);
+    connect(welcomeView,SIGNAL(goDoctorView()),this,SLOT(goDoctorView()));
+    connect(welcomeView,SIGNAL(goPatientView()),this,SLOT(goPatientView()));
+    connect(welcomeView,SIGNAL(goDepartmentView()),this,SLOT(goDepartmentView()));
 }
 
 void MasterView::goDoctorView()
@@ -57,6 +63,7 @@ void MasterView::goPatientView()
     qDebug()<<"goPatientView";
     patientView=new PatientView(this);
     pushWidgetToStackView(patientView);
+    connect(patientView,SIGNAL(goPatientEditView()),this,SLOT(goPatientEditView()));
 }
 
 void MasterView::goPreviousView()
@@ -82,6 +89,29 @@ void MasterView::pushWidgetToStackView(QWidget *widget)
 }
 
 void MasterView::on_btBack_clicked()
+{
+    goPreviousView();
+}
+
+
+void MasterView::on_stackedWidget_currentChanged(int arg1)
+{
+    int count=ui->stackedWidget->count();
+    if(count>1)
+        ui->btBack->setEnabled(true);
+    else
+        ui->btBack->setEnabled(false);
+
+    QString title=ui->stackedWidget->currentWidget()->windowTitle();
+    if(title=="欢迎"){
+        ui->btLogout->setEnabled(true);
+        ui->btBack->setEnabled(false);
+    }else
+        ui->btLogout->setEnabled(false);
+}
+
+
+void MasterView::on_btLogout_clicked()
 {
     goPreviousView();
 }

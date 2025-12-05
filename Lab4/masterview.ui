@@ -19,7 +19,10 @@
      <item>
       <widget class="QPushButton" name="btBack">
        <property name="text">
-        <string>返回</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::DocumentRevert"/>
        </property>
       </widget>
      </item>
@@ -59,7 +62,10 @@
      <item>
       <widget class="QPushButton" name="btLogout">
        <property name="text">
-        <string>注销</string>
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::SystemLogOut"/>
        </property>
       </widget>
      </item>
