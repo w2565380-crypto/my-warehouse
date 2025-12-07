@@ -1,6 +1,7 @@
 #include "idatabase.h"
 #include <QDebug>
 #include <QSqlError>
+#include <QUuid>
 
 void IDatabase::ininDatabase()
 {
@@ -127,6 +128,13 @@ int IDatabase::addNewPatient()
 {
     patientTabModel->insertRow(patientTabModel->rowCount(),QModelIndex());
     QModelIndex curIndex=patientTabModel->index(patientTabModel->rowCount()-1,1);
+
+    int curRecNo=curIndex.row();
+    QSqlRecord curRec=patientTabModel->record(curRecNo);
+    curRec.setValue("CREATETIMESTAMP",QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+    curRec.setValue("ID",QUuid::createUuid().toString(QUuid::WithoutBraces));
+
+    patientTabModel->setRecord(curRecNo,curRec);
     return curIndex.row();
 }
 
