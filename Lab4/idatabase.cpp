@@ -12,6 +12,60 @@ void IDatabase::ininDatabase()
         qDebug()<<"成功打开数据库。";
 }
 
+bool IDatabase::initPatientModel()
+{
+    patientTabModel=new QSqlTableModel(this,database);
+    patientTabModel->setTable("patient");
+    patientTabModel->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    patientTabModel->setSort(patientTabModel->fieldIndex("name"),Qt::AscendingOrder);
+
+    if(!(patientTabModel->select()))
+        return false;
+
+    thePatientSelection=new QItemSelectionModel(patientTabModel);
+    return true;
+}
+
+bool IDatabase::searchPatient(QString filter)
+{
+    patientTabModel->setFilter(filter);
+    return patientTabModel->select();
+}
+
+bool IDatabase::deleteCurrentPatient()
+{
+    QModelIndex curIndex=thePatientSelection->currentIndex();
+    patientTabModel->removeRow(curIndex.row());
+    patientTabModel->submitAll();
+    patientTabModel->select();
+
+}
+
+bool IDatabase::submitPatientEdit()
+{
+    if (patientTabModel->submitAll()) {
+        patientTabModel->select(); // 提交成功后重新加载数据，确保显示正确
+        qDebug() << "Patient data submitted successfully.";
+        return true;
+    } else {
+        qDebug() << "Patient data submission failed:" << patientTabModel->lastError().text();
+        patientTabModel->revertAll(); // 提交失败则回滚
+        return false;
+    }
+}
+
+void IDatabase::revertPatientEdit()
+{
+    patientTabModel->revertAll();
+}
+
+int IDatabase::addNewPatient()
+{
+    patientTabModel->insertRow(patientTabModel->rowCount(),QModelIndex());
+    QModelIndex curIndex=patientTabModel->index(patientTabModel->rowCount()-1,1);
+    return curIndex.row();
+}
+
 QString IDatabase::userLogin(QString userName, QString password)
 {
     //return "登录成功";

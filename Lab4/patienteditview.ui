@@ -102,33 +102,54 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>创建时间：</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QLineEdit" name="lineEdit"/>
+          <widget class="QLineEdit" name="dbEditID"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2"/>
+          <widget class="QLineEdit" name="dbEditName"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_3"/>
+          <widget class="QLineEdit" name="dbEditIDCard"/>
          </item>
          <item>
-          <widget class="QComboBox" name="comboBox"/>
+          <widget class="QComboBox" name="dbCombSex">
+           <item>
+            <property name="text">
+             <string>男</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>女</string>
+            </property>
+           </item>
+          </widget>
          </item>
          <item>
-          <widget class="QDateEdit" name="dateEdit"/>
+          <widget class="QDateEdit" name="dbDataEditDOB"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox"/>
+          <widget class="QSpinBox" name="dbSpinHeight"/>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_2"/>
+          <widget class="QSpinBox" name="dbSpinWeiget"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_4"/>
+          <widget class="QLineEdit" name="dbEditMobile"/>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="dbCreatedTimeStamp"/>
          </item>
         </layout>
        </item>
