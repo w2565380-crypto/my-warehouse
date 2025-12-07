@@ -1,6 +1,7 @@
 #include "patientview.h"
 #include "ui_patientview.h"
 #include "idatabase.h"
+#include <QMessageBox>
 
 PatientView::PatientView(QWidget *parent)
     : QWidget(parent)
@@ -39,15 +40,37 @@ void PatientView::on_btSearch_clicked()
 }
 
 
+// 增强的 PatientView::on_btDelete_clicked()
 void PatientView::on_btDelete_clicked()
 {
-    IDatabase::getInstance().deleteCurrentPatient();
+    QModelIndex curIndex = IDatabase::getInstance().thePatientSelection->currentIndex();
+    if (!curIndex.isValid()) {
+        QMessageBox::warning(this, "警告", "请选择要删除的病人记录。");
+        return;
+    }
+
+    if (QMessageBox::question(this, "确认删除", "确定要删除选中的病人记录吗？",
+                              QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        // 假设 IDatabase::deleteCurrentPatient() 返回 bool
+        if (IDatabase::getInstance().deleteCurrentPatient()) {
+            QMessageBox::information(this, "成功", "病人记录删除成功。");
+        } else {
+            QMessageBox::critical(this, "错误", "病人记录删除失败。");
+        }
+    }
 }
 
 
+// 修正后的 PatientView::on_btEdit_clicked()
 void PatientView::on_btEdit_clicked()
 {
     QModelIndex curIndex=IDatabase::getInstance().thePatientSelection->currentIndex();
-    emit goPatientEditView(curIndex.row());
+
+    if (curIndex.isValid()) {
+        emit goPatientEditView(curIndex.row());
+    } else {
+        // 提示用户选择一行，或者简单地忽略点击
+        qDebug() << "No patient selected for editing.";
+    }
 }
 
