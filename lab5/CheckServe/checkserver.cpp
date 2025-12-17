@@ -14,6 +14,7 @@ void CheckServer::incomingConnection(qintptr socketDescriptor)
         worker->deleteLater();
         return;
     }
+    connect(worker,&ServerWorker::logMessage,this,&CheckServer::logMessage);
     m_clients.append(worker);
     emit logMessage("新用户已连接");
 }

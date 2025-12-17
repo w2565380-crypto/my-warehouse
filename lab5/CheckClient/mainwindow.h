@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include "checkclient.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,7 +25,11 @@ private slots:
 
     void on_loginButton_clicked();
 
+    void connectedToServer();
+    void messageReceived(const QString &text);
+
 private:
     Ui::MainWindow *ui;
+    CheckClient *m_checkClient;
 };
 #endif // MAINWINDOW_H
