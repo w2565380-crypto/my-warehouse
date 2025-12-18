@@ -40,9 +40,11 @@ void ServerWorker::onReadyRead()
 
             QJsonParseError parseError;
             const QJsonDocument jsonDoc=QJsonDocument::fromJson(jsonData,&parseError);
-            if(jsonDoc.isObject()){
-                emit logMessage(QJsonDocument(jsonDoc).toJson(QJsonDocument::Compact));
-                emit jsonReceived(this,jsonDoc.object());
+            if(parseError.error==QJsonParseError::NoError){
+                if(jsonDoc.isObject()){
+                    emit logMessage(QJsonDocument(jsonDoc).toJson(QJsonDocument::Compact));
+                    emit jsonReceived(this,jsonDoc.object());
+                }
             }
         }else{
             break;

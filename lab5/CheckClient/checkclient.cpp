@@ -8,7 +8,6 @@ CheckClient::CheckClient(QObject *parent)
 {
     m_clientSocket=new QTcpSocket(this);
     connect(m_clientSocket,&QTcpSocket::connected,this,&CheckClient::connected);
-    // 修正：连接到 onReadyRead 槽函数
     connect(m_clientSocket,&QTcpSocket::readyRead,this,&CheckClient::onReadyRead);
 }
 
@@ -21,7 +20,15 @@ void CheckClient::onReadyRead()
         socketStream.startTransaction();
         socketStream>>jsonData;
         if(socketStream.commitTransaction()){
-            emit messageReceived(QString::fromUtf8(jsonData));
+            //emit messageReceived(QString::fromUtf8(jsonData));
+            QJsonParseError parseError;
+            const QJsonDocument jsonDoc=QJsonDocument::fromJson(jsonData,&parseError);
+            if(parseError.error==QJsonParseError::NoError){
+                if(jsonDoc.isObject()){
+                    //emit logMessage(QJsonDocument(jsonDoc).toJson(QJsonDocument::Compact));
+                    emit jsonReceived(jsonDoc.object());
+                }
+            }
         }else{
             break;
         }
@@ -48,4 +55,9 @@ void CheckClient::sendMessage(const QString &text, const QString &type)
 void CheckClient::connectToServer(const QHostAddress &address, quint16 port)
 {
     m_clientSocket->connectToHost(address,port);
+}
+
+void CheckClient::disconnectFromServer()
+{
+    m_clientSocket->disconnectFromHost();
 }
