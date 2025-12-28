@@ -31,3 +31,16 @@ bool DatabaseManager::initDatabase() {
     qDebug() << "Database initialized successfully!";
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
