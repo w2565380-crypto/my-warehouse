@@ -48,3 +48,16 @@ bool DatabaseManager::initDatabase() {
     qDebug() << "Database initialized successfully with 3 tables!";
     return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
