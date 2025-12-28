@@ -23,9 +23,13 @@ bool DatabaseManager::initDatabase() {
                          "type TEXT, "
                          "status INTEGER DEFAULT 0, "
                          "room TEXT)";
+
     if (!query.exec(sqlDevices)) {
         qDebug() << "Error: Fail to create devices table." << query.lastError().text();
     }
+    //插入空调与除湿器进行温度，湿度联动效果
+    query.exec("INSERT OR IGNORE INTO devices (name, type, status, room) VALUES ('空调', '电器', 0, '客厅')");
+    query.exec("INSERT OR IGNORE INTO devices (name, type, status, room) VALUES ('除湿器', '电器', 0, '卧室')");
 
     // 4. 创建用户表 (新增：用于登录模块)
     QString sqlUser = "CREATE TABLE IF NOT EXISTS user ("

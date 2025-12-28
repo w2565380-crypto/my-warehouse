@@ -1,3 +1,4 @@
+// datacollector.h
 #ifndef DATACOLLECTOR_H
 #define DATACOLLECTOR_H
 
@@ -9,8 +10,12 @@ class DataCollector : public QObject
 public:
     explicit DataCollector(QObject *parent = nullptr);
 
+signals:
+    // 定义信号：将温度和湿度传递给主界面
+    void dataUpdated(double temp, double humi);
+
 public slots:
-    void collectData(); // 这是一个槽函数，会被定时器触发
+    void collectData();
 };
 
-#endif // DATACOLLECTOR_H
+#endif

@@ -39,6 +39,8 @@ void DataCollector::collectData() {
 
     if(query.exec()) {
         qDebug() << "子线程写入成功 | 温度:" << temp << " 湿度:" << humi;
+        // 发送信号，把数据带给 MainWindow
+        emit dataUpdated(temp, humi);
     } else {
         qDebug() << "写入失败:" << query.lastError().text();
     }

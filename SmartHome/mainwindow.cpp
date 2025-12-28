@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QThread>
 #include <QTimer>
+#include <QSqlQuery>
 #include "datacollector.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -40,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->deviceTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
+
+
     // 在 MainWindow 构造函数内添加：
     QThread* thread = new QThread(this);
     DataCollector* worker = new DataCollector();
@@ -56,6 +59,36 @@ MainWindow::MainWindow(QWidget *parent)
     // 资源管理：线程结束时清理内存
     connect(thread, &QThread::finished, worker, &QObject::deleteLater);
     connect(thread, &QThread::finished, timer, &QObject::deleteLater);
+    // mainwindow.cpp 构造函数中，在 thread->start() 之前添加：
+
+    connect(worker, &DataCollector::dataUpdated, this, [=](double temp, double humi){
+        QSqlQuery query;
+
+        // --- 温度联动：空调 ---
+        if (temp > 28.0) {
+            query.exec("UPDATE devices SET status = 1 WHERE name = '空调'");
+            qDebug() << "检测到高温 (" << temp << "℃)，已自动开启空调！";
+        } else if (temp < 22.0) {
+            query.exec("UPDATE devices SET status = 0 WHERE name = '空调'");
+            qDebug() << "环境凉爽 (" << temp << "℃)，已自动关闭空调。";
+        }
+
+        // --- 湿度联动：除湿器 (新增) ---
+        if (humi > 80.0) {
+            // 湿度高于 80%，开启除湿器
+            query.exec("UPDATE devices SET status = 1 WHERE name = '除湿器'");
+            qDebug() << "湿度过高 (" << humi << "%)，已自动开启除湿器！";
+        } else if (humi < 40.0) {
+            // 湿度低于 40%，关闭除湿器
+            query.exec("UPDATE devices SET status = 0 WHERE name = '除湿器'");
+            qDebug() << "湿度正常 (" << humi << "%)，已自动关闭除湿器。";
+        }
+
+        // 最后统一刷新界面模型，显示最新状态
+        m_model->select();
+    });
+
+
 
     thread->start(); // 正式开启
 
