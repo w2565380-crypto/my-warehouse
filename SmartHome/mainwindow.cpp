@@ -2,6 +2,9 @@
 #include "ui_mainwindow.h"
 #include <QSqlError>
 #include <QMessageBox>
+#include <QThread>
+#include <QTimer>
+#include "datacollector.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -35,6 +38,33 @@ MainWindow::MainWindow(QWidget *parent)
 
     // 让表格自动拉伸填充窗口
     ui->deviceTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+    // 在 MainWindow 构造函数内添加：
+    QThread* thread = new QThread(this);
+    DataCollector* worker = new DataCollector();
+    worker->moveToThread(thread); // 将工人移动到子线程
+
+    QTimer* timer = new QTimer();
+    timer->setInterval(3000); // 3秒采集一次
+    timer->moveToThread(thread); // 定时器也跑在子线程，不干扰UI
+
+    // 逻辑链：线程启动 -> 定时器开始 -> 定时器超时 -> 执行采集
+    connect(thread, &QThread::started, timer, QOverload<>::of(&QTimer::start));
+    connect(timer, &QTimer::timeout, worker, &DataCollector::collectData);
+
+    // 资源管理：线程结束时清理内存
+    connect(thread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(thread, &QThread::finished, timer, &QObject::deleteLater);
+
+    thread->start(); // 正式开启
+
+    // 当主窗口销毁时，让线程停止并安全退出
+    connect(this, &MainWindow::destroyed, thread, [=]() {
+        thread->quit();
+        thread->wait(); // 等待子线程完全停止
+        thread->deleteLater();
+    });
 }
 
 MainWindow::~MainWindow() {

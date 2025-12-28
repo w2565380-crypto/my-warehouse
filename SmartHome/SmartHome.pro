@@ -10,12 +10,14 @@ CONFIG += c++17
 
 SOURCES += \
     databasemanager.cpp \
+    datacollector.cpp \
     logindialog.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     databasemanager.h \
+    datacollector.h \
     logindialog.h \
     mainwindow.h
 
