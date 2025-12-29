@@ -7,9 +7,10 @@
 #include <QSqlQuery>
 #include "datacollector.h"
 
-MainWindow::MainWindow(QWidget *parent)
+MainWindow::MainWindow(QWidget *parent,SceneMode mode)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_currentMode(mode) // 初始化成员变量
 {
     ui->setupUi(this);
 
@@ -41,9 +42,32 @@ MainWindow::MainWindow(QWidget *parent)
     ui->deviceTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
+    // 2. 根据不同模式执行初始动作
+    QSqlQuery query;
+    if (m_currentMode == HomeMode) {
+        // 回家模式：开灯 + 开启自动感应
+        query.exec("UPDATE devices SET status = 1 WHERE name = '灯'");
+        qDebug() << "场景切换：回家模式，欢迎回来，灯已开启";
+    }
+    else if (m_currentMode == AwayMode) {
+        // 离家模式：全关（包括灯、空调、除湿器）
+        query.exec("UPDATE devices SET status = 0");
+        qDebug() << "场景切换：离家模式，全屋设备已关闭";
+    }
+    else if (m_currentMode == SleepMode) {
+        // 睡眠模式：关灯 + 开启空调恒温
+        query.exec("UPDATE devices SET status = 0 WHERE name = '灯'");
+        query.exec("UPDATE devices SET status = 1 WHERE name = '空调'");
+        qDebug() << "场景切换：睡眠模式，灯已熄灭，空调运行中";
+    }
+
+    // 别忘了刷新模型，让 UI 表格立即更新状态
+    if(m_model) m_model->select();
 
 
-    // 在 MainWindow 构造函数内添加：
+
+
+    // 3.多线程日志
     QThread* thread = new QThread(this);
     DataCollector* worker = new DataCollector();
     worker->moveToThread(thread); // 将工人移动到子线程
@@ -64,30 +88,25 @@ MainWindow::MainWindow(QWidget *parent)
     connect(worker, &DataCollector::dataUpdated, this, [=](double temp, double humi){
         QSqlQuery query;
 
-        // --- 温度联动：空调 ---
-        if (temp > 28.0) {
-            query.exec("UPDATE devices SET status = 1 WHERE name = '空调'");
-            qDebug() << "检测到高温 (" << temp << "℃)，已自动开启空调！";
-        } else if (temp < 22.0) {
-            query.exec("UPDATE devices SET status = 0 WHERE name = '空调'");
-            qDebug() << "环境凉爽 (" << temp << "℃)，已自动关闭空调。";
+        // 只有【回家模式】下，才允许环境数据自动控制开关
+        if (m_currentMode == HomeMode) {
+            QSqlQuery query;
+            // 温度控制空调
+            if (temp > 28.0) query.exec("UPDATE devices SET status = 1 WHERE name = '空调'");
+            else if (temp < 22.0) query.exec("UPDATE devices SET status = 0 WHERE name = '空调'");
+
+            // 湿度控制除湿器
+            if (humi > 80.0) query.exec("UPDATE devices SET status = 1 WHERE name = '除湿器'");
+            else if (humi < 40.0) query.exec("UPDATE devices SET status = 0 WHERE name = '除湿器'");
+
+            m_model->select();
+        }
+        // 如果是睡眠模式，我们可以保持空调开启，不做变动
+        else if (m_currentMode == SleepMode) {
+            // 睡眠模式下逻辑... (例如：保持静默或执行特定温度微调)
         }
 
-        // --- 湿度联动：除湿器 (新增) ---
-        if (humi > 80.0) {
-            // 湿度高于 80%，开启除湿器
-            query.exec("UPDATE devices SET status = 1 WHERE name = '除湿器'");
-            qDebug() << "湿度过高 (" << humi << "%)，已自动开启除湿器！";
-        } else if (humi < 40.0) {
-            // 湿度低于 40%，关闭除湿器
-            query.exec("UPDATE devices SET status = 0 WHERE name = '除湿器'");
-            qDebug() << "湿度正常 (" << humi << "%)，已自动关闭除湿器。";
-        }
-
-        // 最后统一刷新界面模型，显示最新状态
-        m_model->select();
     });
-
 
 
     thread->start(); // 正式开启
@@ -98,6 +117,8 @@ MainWindow::MainWindow(QWidget *parent)
         thread->wait(); // 等待子线程完全停止
         thread->deleteLater();
     });
+
+
 }
 
 MainWindow::~MainWindow() {

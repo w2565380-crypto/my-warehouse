@@ -5,7 +5,12 @@
 #include <QDebug>
 #include <QSqlError>
 
-DataCollector::DataCollector(QObject *parent) : QObject(parent) {}
+
+DataCollector::DataCollector(QObject *parent) : QObject(parent) {
+    m_socket = new QTcpSocket(this);
+    // 尝试连接本地模拟服务器（假设 IP 为 127.0.0.1，端口 8080）
+    m_socket->connectToHost("127.0.0.1", 8080);
+}
 
 void DataCollector::collectData() {
     // 1. 检查当前线程是否有可用的数据库连接
@@ -28,7 +33,7 @@ void DataCollector::collectData() {
 
     // 2. 生成随机数据
     double temp = QRandomGenerator::global()->bounded(200, 320) / 10.0;
-    double humi = QRandomGenerator::global()->bounded(400, 700) / 10.0;
+    double humi = QRandomGenerator::global()->bounded(350, 800) / 10.0;
 
     // 3. 执行写入（注意：QSqlQuery 构造时必须指定 db）
     QSqlQuery query(db);
@@ -43,5 +48,21 @@ void DataCollector::collectData() {
         emit dataUpdated(temp, humi);
     } else {
         qDebug() << "写入失败:" << query.lastError().text();
+    }
+
+    // 3. TCP 发送逻辑
+    if (m_socket->state() == QAbstractSocket::ConnectedState) {
+        // 构建符合 IoT 标准的报文格式
+        QString timeStr = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
+        QString payload = QString("{\"device\":\"ControlCenter\",\"temp\":%1,\"humi\":%2,\"time\":\"%3\"}")
+                              .arg(temp).arg(humi).arg(timeStr);
+
+        m_socket->write(payload.toUtf8());
+        m_socket->flush(); // 强制发送缓冲区数据
+        qDebug() << "TCP数据已上报网关:" << payload;
+    } else {
+        // 如果未连接，尝试重连，不阻塞本次采集
+        qDebug() << "TCP未连接，正在尝试重连网关...";
+        m_socket->connectToHost("127.0.0.1", 8080);
     }
 }

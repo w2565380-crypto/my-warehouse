@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QSqlTableModel> // 必须包含这个头文件
+#include "modeselectiondialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -12,11 +13,13 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    // 修改构造函数，增加 mode 参数
+    explicit MainWindow(QWidget *parent = nullptr, SceneMode mode = HomeMode);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
     QSqlTableModel *m_model; // 定义一个指向数据库模型的指针
+    SceneMode m_currentMode; // 增加成员变量存储当前模式
 };
 #endif

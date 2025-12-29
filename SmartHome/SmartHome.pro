@@ -1,4 +1,5 @@
 QT       += core gui sql # 必须加这个才能连数据库
+QT += core gui sql network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -13,17 +14,20 @@ SOURCES += \
     datacollector.cpp \
     logindialog.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    modeselectiondialog.cpp
 
 HEADERS += \
     databasemanager.h \
     datacollector.h \
     logindialog.h \
-    mainwindow.h
+    mainwindow.h \
+    modeselectiondialog.h
 
 FORMS += \
     logindialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    modeselectiondialog.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

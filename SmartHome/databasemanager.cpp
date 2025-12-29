@@ -19,7 +19,7 @@ bool DatabaseManager::initDatabase() {
     // 3. 创建设备表 (原有)
     QString sqlDevices = "CREATE TABLE IF NOT EXISTS devices ("
                          "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                         "name TEXT NOT NULL, "
+                         "name TEXT NOT NULL UNIQUE, "
                          "type TEXT, "
                          "status INTEGER DEFAULT 0, "
                          "room TEXT)";
@@ -30,6 +30,7 @@ bool DatabaseManager::initDatabase() {
     //插入空调与除湿器进行温度，湿度联动效果
     query.exec("INSERT OR IGNORE INTO devices (name, type, status, room) VALUES ('空调', '电器', 0, '客厅')");
     query.exec("INSERT OR IGNORE INTO devices (name, type, status, room) VALUES ('除湿器', '电器', 0, '卧室')");
+    query.exec("INSERT OR IGNORE INTO devices (name, type, status, room) VALUES ('灯', '照明', 0, '客厅')");
 
     // 4. 创建用户表 (新增：用于登录模块)
     QString sqlUser = "CREATE TABLE IF NOT EXISTS user ("
