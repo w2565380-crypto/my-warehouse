@@ -46,24 +46,28 @@ MainWindow::MainWindow(QWidget *parent,SceneMode mode)
 
     // --3. 根据不同模式执行初始动作
     QSqlQuery query;
+    QString timeStr = QDateTime::currentDateTime().toString("hh:mm:ss");
+    QString modeName;
+
     if (m_currentMode == HomeMode) {
-        // 回家模式：开灯 + 开启自动感应
         query.exec("UPDATE devices SET status = 1 WHERE name = '灯'");
-        qDebug() << "场景切换：回家模式，欢迎回来，灯已开启";
+        modeName = "【回家模式】：欢迎回来，系统已为您开启照明";
     }
     else if (m_currentMode == AwayMode) {
-        // 离家模式：全关（包括灯、空调、除湿器）
         query.exec("UPDATE devices SET status = 0");
-        qDebug() << "场景切换：离家模式，全屋设备已关闭";
+        modeName = "【离家模式】：安全防护中，全屋电器已一键关闭";
     }
     else if (m_currentMode == SleepMode) {
-        // 睡眠模式：关灯 + 开启空调恒温
         query.exec("UPDATE devices SET status = 0 WHERE name = '灯'");
         query.exec("UPDATE devices SET status = 1 WHERE name = '空调'");
-        qDebug() << "场景切换：睡眠模式，灯已熄灭，空调运行中";
+        modeName = "【睡眠模式】：灯光已熄灭，空调进入恒温运行";
     }
 
-    // 别忘了刷新模型，让 UI 表格立即更新状态
+    // 记录模式切换日志
+    QListWidgetItem *modeItem = new QListWidgetItem(QString("[%1] 系统状态：%2").arg(timeStr).arg(modeName));
+    modeItem->setForeground(Qt::darkMagenta); // 紫色标注模式切换
+    ui->realTimeLogList->insertItem(0, modeItem);
+
     if(m_model) m_model->select();
 
 
@@ -93,17 +97,52 @@ MainWindow::MainWindow(QWidget *parent,SceneMode mode)
 
         // --- 2. 新增：将信息实时显示到 UI 列表 ---
         QString timeStr = QDateTime::currentDateTime().toString("hh:mm:ss");
-        QString logEntry = QString("[%1] 数据采集成功 -> 温度: %2℃, 湿度: %3%")
-                               .arg(timeStr).arg(temp).arg(humi);
 
-        // 将最新的一行添加到列表第一行（或者最后一行）
+        // 1. 记录原始环境数据
+        QString logEntry = QString("[%1] 环境监测 -> 温度: %2℃, 湿度: %3%").arg(timeStr).arg(temp).arg(humi);
         ui->realTimeLogList->insertItem(0, logEntry);
 
-        // 如果日志太多了，删掉旧的，保持界面整洁
-        if(ui->realTimeLogList->count() > 50) {
-            delete ui->realTimeLogList->takeItem(ui->realTimeLogList->count() - 1);
+        // 2. 自动化决策逻辑（仅限回家模式）
+        if (m_currentMode == HomeMode) {
+            // --- 温度控制空调 ---
+            if (temp > 28.0) {
+                if (query.exec("UPDATE devices SET status = 1 WHERE name = '空调'")) {
+                    QListWidgetItem *item = new QListWidgetItem(QString("[%1] 自动控制：温度过高(%2℃)，开启空调").arg(timeStr).arg(temp));
+                    item->setForeground(Qt::red);
+                    ui->realTimeLogList->insertItem(0, item);
+                }
+            }
+            else if (temp < 22.0) {
+                if (query.exec("UPDATE devices SET status = 0 WHERE name = '空调'")) {
+                    QListWidgetItem *item = new QListWidgetItem(QString("[%1] 自动控制：温度适宜(%2℃)，关闭空调").arg(timeStr).arg(temp));
+                    item->setForeground(Qt::darkGreen);
+                    ui->realTimeLogList->insertItem(0, item);
+                }
+            }
+
+            // --- 湿度控制除湿器 (补全这部分) ---
+            if (humi > 80.0) {
+                if (query.exec("UPDATE devices SET status = 1 WHERE name = '除湿器'")) {
+                    QListWidgetItem *item = new QListWidgetItem(QString("[%1] 自动控制：湿度过高(%2%)，开启除湿器").arg(timeStr).arg(humi));
+                    item->setForeground(Qt::red);
+                    ui->realTimeLogList->insertItem(0, item);
+                }
+            }
+            else if (humi < 40.0) {
+                if (query.exec("UPDATE devices SET status = 0 WHERE name = '除湿器'")) {
+                    QListWidgetItem *item = new QListWidgetItem(QString("[%1] 自动控制：空气干燥(%2%)，关闭除湿器").arg(timeStr).arg(humi));
+                    item->setForeground(Qt::darkGreen);
+                    ui->realTimeLogList->insertItem(0, item);
+                }
+            }
+
+            m_model->select(); // 更新数据库视图
         }
 
+        // 3. 限制日志行数，防止内存占用过高
+        while(ui->realTimeLogList->count() > 50) {
+            delete ui->realTimeLogList->takeItem(ui->realTimeLogList->count() - 1);
+        }
 
 
         // 只有【回家模式】下，才允许环境数据自动控制开关

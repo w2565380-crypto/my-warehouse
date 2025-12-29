@@ -18,7 +18,7 @@ LoginDialog::~LoginDialog()
 
 void LoginDialog::on_btnLogin_clicked()
 {
-    QString user = ui->editUser->text().trimmed(); // trimmed() 去掉前后空格
+    QString user = ui->editUser->text().trimmed();
     QString pwd = ui->editPwd->text().trimmed();
 
     QSqlQuery query;
