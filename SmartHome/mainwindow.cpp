@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QSqlQuery>
 #include "datacollector.h"
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent,SceneMode mode)
     : QMainWindow(parent)
@@ -42,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent,SceneMode mode)
     ui->deviceTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
 
-    // 2. 根据不同模式执行初始动作
+
+    // --3. 根据不同模式执行初始动作
     QSqlQuery query;
     if (m_currentMode == HomeMode) {
         // 回家模式：开灯 + 开启自动感应
@@ -67,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent,SceneMode mode)
 
 
 
-    // 3.多线程日志
+    // --3.多线程日志
     QThread* thread = new QThread(this);
     DataCollector* worker = new DataCollector();
     worker->moveToThread(thread); // 将工人移动到子线程
@@ -87,6 +89,22 @@ MainWindow::MainWindow(QWidget *parent,SceneMode mode)
 
     connect(worker, &DataCollector::dataUpdated, this, [=](double temp, double humi){
         QSqlQuery query;
+
+
+        // --- 2. 新增：将信息实时显示到 UI 列表 ---
+        QString timeStr = QDateTime::currentDateTime().toString("hh:mm:ss");
+        QString logEntry = QString("[%1] 数据采集成功 -> 温度: %2℃, 湿度: %3%")
+                               .arg(timeStr).arg(temp).arg(humi);
+
+        // 将最新的一行添加到列表第一行（或者最后一行）
+        ui->realTimeLogList->insertItem(0, logEntry);
+
+        // 如果日志太多了，删掉旧的，保持界面整洁
+        if(ui->realTimeLogList->count() > 50) {
+            delete ui->realTimeLogList->takeItem(ui->realTimeLogList->count() - 1);
+        }
+
+
 
         // 只有【回家模式】下，才允许环境数据自动控制开关
         if (m_currentMode == HomeMode) {
