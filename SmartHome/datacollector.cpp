@@ -33,7 +33,7 @@ void DataCollector::collectData() {
 
     // 2. 生成随机数据
     double temp = QRandomGenerator::global()->bounded(200, 320) / 10.0;
-    double humi = QRandomGenerator::global()->bounded(350, 800) / 10.0;
+    double humi = QRandomGenerator::global()->bounded(200, 800) / 10.0;
 
     // 3. 执行写入（注意：QSqlQuery 构造时必须指定 db）
     QSqlQuery query(db);
