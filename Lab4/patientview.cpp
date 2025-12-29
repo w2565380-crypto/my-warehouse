@@ -69,7 +69,6 @@ void PatientView::on_btEdit_clicked()
     if (curIndex.isValid()) {
         emit goPatientEditView(curIndex.row());
     } else {
-        // 提示用户选择一行，或者简单地忽略点击
         qDebug() << "No patient selected for editing.";
     }
 }

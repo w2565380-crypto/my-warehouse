@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// ABOUTDIALOG_H
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
@@ -21,7 +21,7 @@ private:
 };
 
 #endif // ABOUTDIALOG_H
-=======
+
 #ifndef ABOUTDIALOG_H
 #define ABOUTDIALOG_H
 
@@ -44,4 +44,4 @@ private:
 };
 
 #endif // ABOUTDIALOG_H
->>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4
+

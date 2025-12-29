@@ -17,8 +17,30 @@
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QLabel" name="titleLabel">
+      <property name="styleSheet">
+       <string notr="true">#titleLabel{
+background:white;
+color:blue;
+font-size:20px;
+border-bottom:1px soild black;
+padding:5px;
+}
+
+#mainFrame{
+borden:none;
+backkgrond:white;
+}
+
+#loginFrame{
+background:qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                               stop:0 #FF0080, stop:0.5 #00FFAA, stop:1 #8000FF);
+borden:1px soild gray;
+padding:10px;
+borden-radius:25px;
+}</string>
+      </property>
       <property name="text">
-       <string>翁圳欣的聊天室</string>
+       <string>翁圳欣的聊天室(2023414290231)</string>
       </property>
      </widget>
     </item>

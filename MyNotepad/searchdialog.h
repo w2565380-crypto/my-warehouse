@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// SEARCHDIALOG_H
 #ifndef SEARCHDIALOG_H
 #define SEARCHDIALOG_H
 
@@ -18,8 +18,8 @@ public:
     ~SearchDialog();
 
 private slots:
-    void bfFindNext_clicked();  // 保持原名，但手动连接
-    void btCancel_clicked();    // 保持原名，但手动连接
+    void bfFindNext_clicked();
+    void btCancel_clicked();
 
 private:
     Ui::SearchDialog *ui;
@@ -28,34 +28,4 @@ private:
 };
 
 #endif // SEARCHDIALOG_H
-=======
-#ifndef SEARCHDIALOG_H
-#define SEARCHDIALOG_H
 
-#include <QDialog>
-#include <QPlainTextEdit>
-
-namespace Ui {
-class SearchDialog;
-}
-
-class SearchDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-    explicit SearchDialog(QWidget *parent = nullptr, QPlainTextEdit *textEdit = nullptr);
-    ~SearchDialog();
-
-private slots:
-    void bfFindNext_clicked();  // 保持原名，但手动连接
-    void btCancel_clicked();    // 保持原名，但手动连接
-
-private:
-    Ui::SearchDialog *ui;
-    QPlainTextEdit *m_textEdit;
-    int m_lastFoundPosition;
-};
-
-#endif // SEARCHDIALOG_H
->>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4

@@ -14,7 +14,6 @@ LoginView::~LoginView()
     delete ui;
 }
 
-// 修正后的 LoginView::on_btSignIn_clicked()
 void LoginView::on_btSignIn_clicked()
 {
     QString status = IDatabase::getInstance().userLogin(

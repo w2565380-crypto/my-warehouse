@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+// CODEEDITOR_H
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
@@ -49,7 +49,7 @@ private:
 };
 
 #endif // CODEEDITOR_H
-=======
+
 #ifndef CODEEDITOR_H
 #define CODEEDITOR_H
 
@@ -100,4 +100,4 @@ private:
 };
 
 #endif // CODEEDITOR_H
->>>>>>> 28edf83d02aa91b9b4972741e4c235380ab33ab4
+

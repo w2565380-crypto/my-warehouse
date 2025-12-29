@@ -11,12 +11,11 @@ MasterView::MasterView(QWidget *parent)
 
     this->setWindowFlag(Qt::FramelessWindowHint);
 
-    IDatabase::getInstance(); // 先初始化数据库
+    IDatabase::getInstance();
 
-    // 确保 loginView 成员指针初始化为 nullptr
-    loginView = nullptr; // 通常在 .h 文件中初始化，或在初始化列表显式设置
+    loginView = nullptr;
 
-    goLoginView(); // <--- 仅调用一次跳转函数来创建和显示
+    goLoginView();
 }
 
 MasterView::~MasterView()
@@ -28,16 +27,12 @@ void MasterView::goLoginView()
 {
     qDebug() << "goLoginView";
 
-    // 1. 惰性创建：仅在第一次调用时创建实例
+
     if (!loginView) {
         loginView = new LoginView(this);
-        // 2. 确保信号槽仅连接一次
         connect(loginView, SIGNAL(loginSuccess()), this, SLOT(goWelcomeView()));
     }
 
-    // 3. 将已有的实例添加到 QStackedWidget 并显示
-    // ⚠️ 注意：addWidget 如果 widget 已经在 Stack 中，它会忽略，这是安全的。
-    // 但是，在调用 setCurrentWidget 之前，建议先确保 loginView 确实被 add 进去了。
     ui->stackedWidget->addWidget(loginView);
     ui->stackedWidget->setCurrentWidget(loginView);
     ui->labelTitle->setText(loginView->windowTitle());
