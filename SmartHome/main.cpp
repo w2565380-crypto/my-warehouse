@@ -3,6 +3,7 @@
 #include "modeselectiondialog.h" // 记得包含新头文件
 #include <QApplication>
 #include "DatabaseManager.h"
+#include "logviewer.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,35 +11,36 @@ int main(int argc, char *argv[])
 
     if (!DatabaseManager::initDatabase()) return -1;
 
-    bool keepRunning = true;
-    while (keepRunning) {
-        keepRunning = false; // 默认执行完就退出
+    bool restartApp = true;
+    while (restartApp) {
+        restartApp = false; // 默认不重复执行
 
         LoginDialog login;
         if (login.exec() == QDialog::Accepted) {
 
-            // 登录成功后，弹出模式选择对话框
+            // 模式选择界面
             ModeSelectionDialog selection;
-            int result = selection.exec();
+            int ret = selection.exec();
 
-            if (result == QDialog::Accepted) {
-                // 情况 A：选择了某种模式进入主界面
-                if (!selection.isLogRequested()) {
-                    MainWindow *w = new MainWindow(nullptr, selection.getSelectedMode());
-                    w->setAttribute(Qt::WA_DeleteOnClose); // 窗口关闭时自动释放内存
-                    w->show();
-                    return a.exec();
+            if (ret == QDialog::Accepted) {
+                if (selection.isLogRequested()) {
+                    // --- 情况 A：查看日志 ---
+                    LogViewer logWin;
+                    logWin.exec();     // 阻塞在这里，直到日志窗口关闭
+                    restartApp = true; // 【关键】关闭日志窗口后，回到 while 开头重新选模式
                 } else {
-                    // 情况 B：跳转到日志界面（如果还没写，可以先弹个窗）
-                    // LogViewer *v = new LogViewer();
-                    // v->show();
-                    // return a.exec();
+                    // --- 情况 B：选择场景进入主控制中心 ---
+                    MainWindow w(nullptr, selection.getSelectedMode());
+                    w.show();
+                    return a.exec(); // 进入 Qt 事件循环，主程序正常运行
                 }
-            } else if (selection.isBackRequested()) {
-                // 情况 C：点击了“返回上一级”，重新循环回到登录界面
-                keepRunning = true;
+            }
+            else if (selection.isBackRequested()) {
+                // --- 情况 C：点击返回上一级 ---
+                restartApp = true; // 回到登录界面
             }
         }
     }
+
     return 0;
 }

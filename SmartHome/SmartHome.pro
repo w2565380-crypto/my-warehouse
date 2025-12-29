@@ -13,6 +13,7 @@ SOURCES += \
     databasemanager.cpp \
     datacollector.cpp \
     logindialog.cpp \
+    logviewer.cpp \
     main.cpp \
     mainwindow.cpp \
     modeselectiondialog.cpp
@@ -21,11 +22,13 @@ HEADERS += \
     databasemanager.h \
     datacollector.h \
     logindialog.h \
+    logviewer.h \
     mainwindow.h \
     modeselectiondialog.h
 
 FORMS += \
     logindialog.ui \
+    logviewer.ui \
     mainwindow.ui \
     modeselectiondialog.ui
 

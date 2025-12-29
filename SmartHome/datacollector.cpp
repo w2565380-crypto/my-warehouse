@@ -52,17 +52,14 @@ void DataCollector::collectData() {
 
     // 3. TCP 发送逻辑
     if (m_socket->state() == QAbstractSocket::ConnectedState) {
-        // 构建符合 IoT 标准的报文格式
-        QString timeStr = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-        QString payload = QString("{\"device\":\"ControlCenter\",\"temp\":%1,\"humi\":%2,\"time\":\"%3\"}")
-                              .arg(temp).arg(humi).arg(timeStr);
-
+        // 已连接，正常发送数据
+        QString payload = QString("{\"temp\":%1,\"humi\":%2}").arg(temp).arg(humi);
         m_socket->write(payload.toUtf8());
-        m_socket->flush(); // 强制发送缓冲区数据
-        qDebug() << "TCP数据已上报网关:" << payload;
-    } else {
-        // 如果未连接，尝试重连，不阻塞本次采集
-        qDebug() << "TCP未连接，正在尝试重连网关...";
+    }
+    else if (m_socket->state() == QAbstractSocket::UnconnectedState) {
+        // 只有在彻底断开时，才发起【单次】重连请求
+        qDebug() << "检测到连接断开，尝试连接服务器...";
         m_socket->connectToHost("127.0.0.1", 8080);
     }
+    // 如果状态是 Connecting 或 HostLookup，直接跳过，等待它完成即可
 }
