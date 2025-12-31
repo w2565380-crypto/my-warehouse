@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent, SceneMode mode)
 {
     ui->setupUi(this);
 
+    // 【添加这一行】：确保点击返回或关闭窗口时，对象被 delete，从而发出 destroyed 信号
+    this->setAttribute(Qt::WA_DeleteOnClose);
+
     // 1. 初始化数据库模型
     m_model = new QSqlTableModel(this);
     m_model->setTable("devices");
@@ -158,3 +161,9 @@ MainWindow::MainWindow(QWidget *parent, SceneMode mode)
 MainWindow::~MainWindow() {
     delete ui;
 }
+
+void MainWindow::on_btnBack_clicked()
+{
+    this->close();     // 关闭自己
+}
+

@@ -17,9 +17,17 @@ public:
     explicit MainWindow(QWidget *parent = nullptr, SceneMode mode = HomeMode);
     ~MainWindow();
 
+private slots:
+    void on_btnBack_clicked();
+
 private:
     Ui::MainWindow *ui;
     QSqlTableModel *m_model; // 定义一个指向数据库模型的指针
     SceneMode m_currentMode; // 增加成员变量存储当前模式
+
+
+signals:
+    void backToMenu();
+
 };
 #endif

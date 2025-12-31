@@ -47,12 +47,8 @@ void LoginDialog::on_btnLogin_clicked()
 }
 
 
-
-
-
-
-
-
-
-
+void LoginDialog::on_btnLoginOut_clicked()
+{
+    this->close();
+}
 
