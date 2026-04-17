@@ -1,0 +1,15 @@
+# 忽略 Python 缓存
+__pycache__/
+*.py[cod]
+
+# 忽略 YOLO 训练生成的运行结果文件夹
+runs/
+
+# 忽略数据集中的图片（如果你的图片很多/很大，建议不要传 GitHub，只传代码）
+# 如果图片不多（比如现在的 15 张），可以注释掉下面这两行
+train/images/
+val/images/
+project/images/
+
+# 忽略大模型权重文件（超过 100MB 会被 GitHub 拒绝）
+*.pt

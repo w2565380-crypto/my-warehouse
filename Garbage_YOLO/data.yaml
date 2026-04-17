@@ -1,0 +1,9 @@
+# 训练集和验证集的路径
+path: G:/ML/Garbage_YOLO  # 你的项目根目录
+train: train/images
+val: val/images
+
+# 类别信息
+names:
+  0: charging treasure     # 必须和你 classes.txt 里的顺序一致
+  # 如果还有别的，按顺序往下排
