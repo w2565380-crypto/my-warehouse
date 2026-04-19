@@ -9,7 +9,7 @@ runs/
 # 如果图片不多（比如现在的 15 张），可以注释掉下面这两行
 train/images/
 val/images/
-project/images/
+project/
 
 # 忽略大模型权重文件（超过 100MB 会被 GitHub 拒绝）
-*.pt
+# *.pt
