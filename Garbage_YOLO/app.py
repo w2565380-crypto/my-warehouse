@@ -41,4 +41,5 @@ with gr.Blocks(title="AI 垃圾分类助手") as demo:
 # 5. 启动应用
 if __name__ == "__main__":
     # share=True 会生成一个公网访问链接，有效期 72 小时
-    demo.launch(share=False)
+    # demo.launch(share=False)
+    demo.launch(share=True)

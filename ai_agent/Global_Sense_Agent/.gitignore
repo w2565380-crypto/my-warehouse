@@ -1,0 +1,27 @@
+# 1. 敏感信息（最重要！）
+.env
+
+# 2. Python 缓存与运行产生的文件
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.history/
+
+# 3. 虚拟环境（不需要上传，别人用 requirements.txt 自行安装）
+venv/
+.venv/
+env/
+# 如果你用 conda 并在目录下创建了环境
+cb_agent/
+
+# 4. 数据文件（如果数据很大或包含隐私）
+data/
+*.log
+*.csv
+*.json
+
+# 5. 编辑器配置
+.vscode/
+.idea/
+.DS_Store
