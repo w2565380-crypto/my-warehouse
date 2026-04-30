@@ -1,9 +1,9 @@
 # state.py
-from typing import TypedDict, List
+from typing import TypedDict, Optional, Dict, Any
 
-class AgentState(TypedDict):
+class AgentState(TypedDict, total=False):
     input_task: str
     raw_data: str
-    pain_points: str  # 或者使用 List[str]
+    analysis: Dict[str, Any]   # 👈 必须加
+    pain_points: str
     revision_count: int
-    final_report: str
