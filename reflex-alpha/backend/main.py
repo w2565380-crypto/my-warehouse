@@ -3,12 +3,21 @@ import json
 import time
 
 from dotenv import load_dotenv
-
+from agents.entity_extraction_agent import (
+    run_entity_extraction_agent
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 
 from openai import OpenAI
+from agents.analyst_agent import run_analyst_agent
+from agents.reflection_agent import run_reflection_agent
+
+from graph.knowledge_graph import (
+    add_relationship,
+    get_related_entities
+)
 
 load_dotenv()
 
@@ -47,93 +56,26 @@ def analyze():
 
     headline = "NVIDIA faces new export restrictions to China"
 
-    # -----------------------------
-    # Agent 1: Initial Analysis
-    # -----------------------------
+    analysis = run_analyst_agent(headline)
 
-    analysis_response = client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {
-                "role": "system",
-                "content": """
-You are an elite financial analyst.
-
-ONLY return valid JSON.
-
-Format:
-{
-  "sentiment": "...",
-  "confidence": 0.0,
-  "reasoning": "..."
-}
-"""
-            },
-            {
-                "role": "user",
-                "content": headline
-            }
-        ],
-        temperature=0
+    reflection = run_reflection_agent(
+        headline,
+        analysis
     )
 
-    analysis_raw = (
-        analysis_response
-        .choices[0]
-        .message
-        .content
+# --------------------------------
+# Entity Extraction Agent
+# --------------------------------
+
+    extracted = run_entity_extraction_agent(
+        headline
     )
 
-    analysis_cleaned = (
-        analysis_raw
-        .replace("```json", "")
-        .replace("```", "")
-        .strip()
-    )
-
-    analysis = json.loads(analysis_cleaned)
-
-    # -----------------------------
-    # Agent 2: Reflection
-    # -----------------------------
-
-    reflection_response = client.chat.completions.create(
-        model="deepseek-chat",
-        messages=[
-            {
-                "role": "system",
-                "content": """
-You are a critique agent.
-
-Review the financial analysis.
-
-Find:
-- logical flaws
-- weak assumptions
-- missing risks
-
-Be concise.
-"""
-            },
-            {
-                "role": "user",
-                "content": f"""
-Headline:
-{headline}
-
-Analysis:
-{analysis}
-"""
-            }
-        ],
-        temperature=0
-    )
-
-    reflection = (
-        reflection_response
-        .choices[0]
-        .message
-        .content
+    for relation in extracted["relationships"]:
+        add_relationship(
+        relation["source"],
+        relation["relation"],
+        relation["target"]
     )
 
     return {
@@ -145,7 +87,9 @@ Analysis:
             "reasoning": analysis["reasoning"]
         },
 
-        "reflection": reflection
+        "reflection": reflection,
+        "knowledge_graph": extracted
+        
     }
 
 # ----------------------------------------
