@@ -19,6 +19,14 @@ from graph.knowledge_graph import (
     get_related_entities
 )
 
+from graph.reasoning_engine import (
+    find_competitors
+)
+
+from agents.reasoning_agent import (
+    run_reasoning_agent
+)
+
 load_dotenv()
 
 client = OpenAI(
@@ -42,7 +50,6 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-
     return {
         "message": "ReflexAlpha Backend Running"
     }
@@ -53,7 +60,6 @@ def root():
 
 @app.get("/analyze")
 def analyze():
-
     headline = "NVIDIA faces new export restrictions to China"
 
     analysis = run_analyst_agent(headline)
@@ -63,9 +69,9 @@ def analyze():
         analysis
     )
 
-# --------------------------------
-# Entity Extraction Agent
-# --------------------------------
+    # --------------------------------
+    # Entity Extraction Agent
+    # --------------------------------
 
     extracted = run_entity_extraction_agent(
         headline
@@ -73,24 +79,51 @@ def analyze():
 
     for relation in extracted["relationships"]:
         add_relationship(
-        relation["source"],
-        relation["relation"],
-        relation["target"]
+            relation["source"],
+            relation["relation"],
+            relation["target"]
+        )
+
+    # 在这里添加了指定的硬编码知识图谱关系
+    add_relationship(
+        "AMD",
+        "competes_with",
+        "NVIDIA"
     )
+
+    add_relationship(
+        "AMD",
+        "belongs_to",
+        "Semiconductor Sector"
+    )
+
+    add_relationship(
+        "TSMC",
+        "supplies",
+        "NVIDIA"
+    )
+
+    competitors = find_competitors("AMD")
+    graph_context = extracted["relationships"]
+
+    reasoning = run_reasoning_agent(
+    headline,
+    graph_context
+)
 
     return {
         "headline": headline,
-
         "initial_analysis": {
             "sentiment": analysis["sentiment"],
             "confidence": analysis["confidence"],
             "reasoning": analysis["reasoning"]
         },
-
         "reflection": reflection,
-        "knowledge_graph": extracted
-        
+        "knowledge_graph": extracted,
+        "competitors": competitors,
+        "reasoning_agent": reasoning
     }
+
 
 # ----------------------------------------
 # Streaming Agent Thinking
@@ -98,9 +131,7 @@ def analyze():
 
 @app.get("/analyze-stream")
 def analyze_stream():
-
     def event_generator():
-
         events = [
             "Collector Agent: Gathering market news...",
             "Collector Agent: Found semiconductor-related articles...",
@@ -112,9 +143,7 @@ def analyze_stream():
         ]
 
         for event in events:
-
             yield f"data: {event}\n\n"
-
             time.sleep(1)
 
     return StreamingResponse(
