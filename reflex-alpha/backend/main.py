@@ -27,6 +27,14 @@ from agents.reasoning_agent import (
     run_reasoning_agent
 )
 
+from tools.news_tool import (
+    get_latest_news
+)
+
+from agents.news_selection_agent import (
+    run_news_selection_agent
+)
+
 load_dotenv()
 
 client = OpenAI(
@@ -60,7 +68,18 @@ def root():
 
 @app.get("/analyze")
 def analyze():
-    headline = "NVIDIA faces new export restrictions to China"
+    news = get_latest_news()
+    selection = run_news_selection_agent(
+        news
+    )
+
+    selected_index = selection[
+        "selected_index"
+    ]
+
+    headline = news[
+        selected_index
+    ]["title"]
 
     analysis = run_analyst_agent(headline)
 
@@ -121,7 +140,9 @@ def analyze():
         "reflection": reflection,
         "knowledge_graph": extracted,
         "competitors": competitors,
-        "reasoning_agent": reasoning
+        "reasoning_agent": reasoning,
+        "news": news,
+        "news_selection": selection
     }
 
 
