@@ -1,22 +1,36 @@
 import feedparser
 
-GOOGLE_NEWS_RSS = (
+RSS_URL = (
     "https://news.google.com/rss/search?q=stock+market"
 )
 
 def get_latest_news():
 
     feed = feedparser.parse(
-        GOOGLE_NEWS_RSS
+        RSS_URL
     )
 
-    headlines = []
+    news = []
 
     for entry in feed.entries[:5]:
 
-        headlines.append({
+        news.append({
+
             "title": entry.title,
+
             "link": entry.link
         })
 
-    return headlines
+    # fallback
+    if len(news) == 0:
+
+        news = [
+            {
+                "title": (
+                    "NVIDIA faces new export restrictions to China"
+                ),
+                "link": ""
+            }
+        ]
+
+    return news

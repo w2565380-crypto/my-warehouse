@@ -2,44 +2,53 @@ import json
 
 from services.llm import chat
 
-ENTITY_EXTRACTION_PROMPT = """
-You are a financial knowledge graph extraction agent.
+from graph.ontology import (
+    ALLOWED_RELATIONS
+)
 
+ENTITY_EXTRACTION_PROMPT = f"""
 Extract:
-
-1. entities
+1. typed entities
 2. relationships
 
-Allowed relationship types:
+ONLY use the following relationship types:
+{ALLOWED_RELATIONS}
 
-- affects
-- restricted_by
-- belongs_to
-- operates_in
-- competes_with
-- invests_in
-- supplies
-- partners_with
+⚠️ CRITICAL DIRECTION RULES:
+- Ensure the direction of relationships is logically and causally correct.
+- Macro factors, countries, or events should AFFECT market indices or companies, NOT the other way around. 
+  - Good: "US" -> "AFFECTS" -> "Dow"
+  - Bad: "Dow" -> "AFFECTS" -> "US"
+- Geopolitical restrictions or sanctions flow from the initiator/source to the impacted country.
+  - Good: "US" -> "RESTRICTED_BY" -> "Iran" (or vice versa, depending on your ALLOWED_RELATIONS definition. If Iran is limiting the US, source is Iran, target is US).
 
-ONLY use these relationship labels.
-
-ONLY return valid JSON.
+Return ONLY valid JSON.
 
 Format:
-
-{
+{{
   "entities": [
-    "..."
+    {{
+      "name": "",
+      "type": ""
+    }}
   ],
-
   "relationships": [
-    {
-      "source": "...",
-      "relation": "...",
-      "target": "..."
-    }
+    {{
+      "source": "",
+      "relation": "",
+      "target": ""
+    }}
   ]
-}
+}}
+
+Allowed entity types:
+- Company
+- Country
+- Sector
+- Index
+- Technology
+- Government
+- Person
 """
 
 def run_entity_extraction_agent(headline):
@@ -62,4 +71,21 @@ def run_entity_extraction_agent(headline):
         .strip()
     )
 
-    return json.loads(cleaned)
+    extracted = json.loads(cleaned)
+
+    valid_relationships = []
+
+    for rel in extracted["relationships"]:
+
+        if (
+            rel["relation"]
+            in ALLOWED_RELATIONS
+        ):
+
+            valid_relationships.append(rel)
+
+    extracted["relationships"] = (
+        valid_relationships
+    )
+
+    return extracted

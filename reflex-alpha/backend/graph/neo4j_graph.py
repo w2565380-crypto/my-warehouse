@@ -24,15 +24,17 @@ driver = GraphDatabase.driver(
 
 
 
-def add_relationship(
-    source,
+def add_typed_relationship(
+    source_name,
+    source_type,
     relation,
-    target
+    target_name,
+    target_type
 ):
 
     query = f"""
-    MERGE (a:Entity {{name: $source}})
-    MERGE (b:Entity {{name: $target}})
+    MERGE (a:{source_type} {{name: $source_name}})
+    MERGE (b:{target_type} {{name: $target_name}})
     MERGE (a)-[:{relation}]->(b)
     """
 
@@ -40,6 +42,6 @@ def add_relationship(
 
         session.run(
             query,
-            source=source,
-            target=target
+            source_name=source_name,
+            target_name=target_name
         )

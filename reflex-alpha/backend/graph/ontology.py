@@ -1,0 +1,24 @@
+ALLOWED_RELATIONS = [
+
+    "COMPETES_WITH",
+
+    "SUPPLIES",
+
+    "PARTNERS_WITH",
+
+    "RESTRICTED_BY",
+
+    "BELONGS_TO_SECTOR",
+
+    "AFFECTS",
+
+    "INVESTS_IN",
+
+    "ACQUIRES",
+
+    "MANUFACTURES",
+
+    "USES",
+
+    "REGULATED_BY"
+]

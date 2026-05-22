@@ -14,10 +14,6 @@ from openai import OpenAI
 from agents.analyst_agent import run_analyst_agent
 from agents.reflection_agent import run_reflection_agent
 
-from graph.knowledge_graph import (
-    add_relationship,
-    get_related_entities
-)
 
 from graph.reasoning_engine import (
     find_competitors
@@ -33,6 +29,14 @@ from tools.news_tool import (
 
 from agents.news_selection_agent import (
     run_news_selection_agent
+)
+
+from graph.neo4j_graph import (
+    add_typed_relationship
+)
+
+from graph.retrieval import (
+    retrieve_related_knowledge
 )
 
 load_dotenv()
@@ -52,6 +56,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # ----------------------------------------
 # Root
 # ----------------------------------------
@@ -68,7 +73,13 @@ def root():
 
 @app.get("/analyze")
 def analyze():
+
+    # --------------------------------
+    # Get Latest News
+    # --------------------------------
+
     news = get_latest_news()
+
     selection = run_news_selection_agent(
         news
     )
@@ -81,7 +92,17 @@ def analyze():
         selected_index
     ]["title"]
 
-    analysis = run_analyst_agent(headline)
+    # --------------------------------
+    # Analyst Agent
+    # --------------------------------
+
+    analysis = run_analyst_agent(
+        headline
+    )
+
+    # --------------------------------
+    # Reflection Agent
+    # --------------------------------
 
     reflection = run_reflection_agent(
         headline,
@@ -96,52 +117,142 @@ def analyze():
         headline
     )
 
-    for relation in extracted["relationships"]:
-        add_relationship(
+    # --------------------------------
+    # Build Entity Type Map
+    # --------------------------------
+
+    entity_map = {}
+
+    for entity in extracted.get(
+        "entities",
+        []
+    ):
+
+        entity_map[
+            entity["name"]
+        ] = entity["type"]
+
+    # --------------------------------
+    # Store Typed Relationships
+    # --------------------------------
+
+    for relation in extracted.get(
+        "relationships",
+        []
+    ):
+
+        add_typed_relationship(
+
             relation["source"],
+
+            entity_map.get(
+                relation["source"],
+                "Entity"
+            ),
+
             relation["relation"],
-            relation["target"]
+
+            relation["target"],
+
+            entity_map.get(
+                relation["target"],
+                "Entity"
+            )
         )
 
-    # 在这里添加了指定的硬编码知识图谱关系
-    add_relationship(
+    # --------------------------------
+    # Add Background Knowledge
+    # --------------------------------
+
+    add_typed_relationship(
         "AMD",
-        "competes_with",
-        "NVIDIA"
+        "Company",
+        "COMPETES_WITH",
+        "NVIDIA",
+        "Company"
     )
 
-    add_relationship(
-        "AMD",
-        "belongs_to",
-        "Semiconductor Sector"
-    )
-
-    add_relationship(
+    add_typed_relationship(
         "TSMC",
-        "supplies",
-        "NVIDIA"
+        "Company",
+        "SUPPLIES",
+        "NVIDIA",
+        "Company"
     )
 
-    competitors = find_competitors("AMD")
-    graph_context = extracted["relationships"]
+    add_typed_relationship(
+        "NVIDIA",
+        "Company",
+        "BELONGS_TO_SECTOR",
+        "Semiconductor",
+        "Sector"
+    )
+
+    # --------------------------------
+    # Graph Reasoning
+    # --------------------------------
+
+    
+    
+
+    # --------------------------------
+    # Reasoning Agent
+    # --------------------------------
+
+
+    retrieved_knowledge = []
+
+    for entity in extracted.get(
+        "entities",
+        []
+    ):
+
+        related = retrieve_related_knowledge(
+            entity["name"]
+        )
+
+        retrieved_knowledge.extend(
+            related
+        )
+
+    graph_context = retrieved_knowledge
 
     reasoning = run_reasoning_agent(
-    headline,
-    graph_context
-)
+        headline,
+        graph_context
+    )
+
+    # --------------------------------
+    # Final Response
+    # --------------------------------
 
     return {
+
         "headline": headline,
+
         "initial_analysis": {
-            "sentiment": analysis["sentiment"],
-            "confidence": analysis["confidence"],
-            "reasoning": analysis["reasoning"]
+
+            "sentiment": analysis.get(
+                "sentiment"
+            ),
+
+            "confidence": analysis.get(
+                "confidence"
+            ),
+
+            "reasoning": analysis.get(
+                "reasoning"
+            )
         },
+
         "reflection": reflection,
+
         "knowledge_graph": extracted,
-        "competitors": competitors,
+
         "reasoning_agent": reasoning,
+
         "news": news,
+
         "news_selection": selection
     }
 
