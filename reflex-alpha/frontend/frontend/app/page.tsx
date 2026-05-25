@@ -1,216 +1,287 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import GraphView from "./components/GraphView";
+import { useState } from "react";
+
+interface AnalysisResult {
+  headline: string;
+
+  initial_analysis: {
+    sentiment: string;
+    confidence: number;
+    reasoning: string;
+  };
+
+  reflection: string;
+
+  knowledge_graph: any;
+
+  reasoning_agent: string;
+}
 
 export default function Home() {
 
-  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] =
+    useState<boolean>(false);
 
-  const [events, setEvents] = useState<string[]>([]);
+  const [result, setResult] =
+    useState<AnalysisResult | null>(null);
 
-  // -----------------------------
-  // Fetch analysis result
-  // -----------------------------
+  const [thinkingSteps, setThinkingSteps] =
+    useState<string[]>([]);
 
-  useEffect(() => {
+  const [graphData, setGraphData] =
+  useState<any[]>([]);
 
-    fetch("http://127.0.0.1:8000/analyze")
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-      });
+  async function runAnalysis() {
 
-  }, []);
+    setLoading(true);
 
-  // -----------------------------
-  // Streaming Agent Thinking
-  // -----------------------------
+    setResult(null);
 
-  useEffect(() => {
+    setThinkingSteps([]);
+
+    // --------------------------------
+    // Start Streaming Agent Thoughts
+    // --------------------------------
 
     const eventSource = new EventSource(
       "http://127.0.0.1:8000/analyze-stream"
     );
 
-    eventSource.onmessage = (event) => {
+    eventSource.onmessage = (
+      event: MessageEvent
+    ) => {
 
-      setEvents((prev) => [
+      setThinkingSteps((prev) => [
         ...prev,
         event.data
       ]);
-
     };
 
-    return () => {
+    // --------------------------------
+    // Fetch Final Analysis
+    // --------------------------------
+
+    try {
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/analyze"
+      );
+
+      const data = await response.json();
+
+      const graphResponse = await fetch(
+        "http://127.0.0.1:8000/graph"
+      );
+
+      const graphJson =
+        await graphResponse.json();
+
+      setGraphData(
+        graphJson.relationships || []
+      );
+
+      setResult(data);
+
+    } catch (error) {
+
+      console.error(error);
+
+    } finally {
+
+      setLoading(false);
+
       eventSource.close();
-    };
-
-  }, []);
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-black text-white p-6">
 
-      {/* Header */}
+    <main
+      style={{
+        padding: "40px",
+        fontFamily: "Arial",
+        backgroundColor: "#0f172a",
+        minHeight: "100vh",
+        color: "white"
+      }}
+    >
 
-      <div className="mb-10">
+      <h1
+        style={{
+          fontSize: "42px",
+          marginBottom: "20px"
+        }}
+      >
+        ReflexAlpha
+      </h1>
 
-        <h1 className="text-4xl font-bold">
-          ReflexAlpha
-        </h1>
+      <button
+        onClick={runAnalysis}
+        disabled={loading}
+        style={{
+          padding: "12px 20px",
+          fontSize: "16px",
+          cursor: "pointer",
+          marginBottom: "30px",
+          borderRadius: "8px",
+          border: "none",
+          backgroundColor: "#2563eb",
+          color: "white"
+        }}
+      >
+        {loading
+          ? "Agents Running..."
+          : "Run AI Analysis"}
+      </button>
 
-        <p className="mt-2 text-zinc-400">
-          Reflective Multi-Agent Financial Intelligence Platform
-        </p>
+      {/* -------------------------------- */}
+      {/* Agent Thinking Stream */}
+      {/* -------------------------------- */}
+
+      <div
+        style={{
+          background: "#111827",
+          color: "#00ff99",
+          padding: "20px",
+          borderRadius: "10px",
+          marginBottom: "30px",
+          minHeight: "220px",
+          fontFamily: "monospace",
+          border: "1px solid #1f2937"
+        }}
+      >
+
+        <h2
+          style={{
+            marginBottom: "20px"
+          }}
+        >
+          Agent Thinking
+        </h2>
+
+        {thinkingSteps.map(
+          (step, index) => (
+
+            <div
+              key={index}
+              style={{
+                marginBottom: "12px"
+              }}
+            >
+              {step}
+            </div>
+          )
+        )}
 
       </div>
 
-      {/* Loading */}
+      {/* -------------------------------- */}
+      {/* Final Result */}
+      {/* -------------------------------- */}
 
-      {!data ? (
+      {result && (
 
-        <p>Loading AI analysis...</p>
+        <div>
 
-      ) : (
+          <section
+            style={{
+              marginBottom: "30px"
+            }}
+          >
 
-        <div className="grid grid-cols-12 gap-4">
-
-          {/* LEFT PANEL */}
-
-          <div className="col-span-3 rounded-2xl border border-zinc-800 p-4">
-
-            <h2 className="mb-4 text-xl font-semibold">
-              News Feed
+            <h2>
+              Selected Headline
             </h2>
 
-            <div className="rounded-xl bg-zinc-900 p-4">
+            <p>
+              {result.headline}
+            </p>
 
-              <p className="text-sm text-zinc-400 mb-2">
-                Reuters
-              </p>
+          </section>
 
-              <p>
-                {data.headline}
-              </p>
+          <section
+            style={{
+              marginBottom: "30px"
+            }}
+          >
 
-            </div>
-
-          </div>
-
-          {/* CENTER PANEL */}
-
-          <div className="col-span-6 rounded-2xl border border-zinc-800 p-4">
-
-            <h2 className="mb-4 text-xl font-semibold">
-              AI Analysis
+            <h2>
+              Initial Analysis
             </h2>
 
-            {/* Initial Analysis */}
+            <pre
+              style={{
+                whiteSpace: "pre-wrap"
+              }}
+            >
+              {JSON.stringify(
+                result.initial_analysis,
+                null,
+                2
+              )}
+            </pre>
 
-            <div className="rounded-xl bg-zinc-900 p-4 mb-4">
+          </section>
 
-              <p className="text-blue-400 font-medium">
-                Market Analyst Agent
-              </p>
+          <section
+            style={{
+              marginBottom: "30px"
+            }}
+          >
 
-              <p className="mt-3 text-zinc-300">
-                {data.initial_analysis.reasoning}
-              </p>
-
-            </div>
-
-            {/* Reflection */}
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-
-              <p className="text-yellow-400 font-medium">
-                Reflection Agent
-              </p>
-
-              <p className="mt-3 text-zinc-300">
-                {data.reflection}
-              </p>
-
-            </div>
-
-            {/* Streaming Thinking */}
-
-            <div className="mt-8">
-
-              <h2 className="mb-4 text-xl font-semibold">
-                Live Agent Thinking
-              </h2>
-
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
-
-                <div className="space-y-3">
-
-                  {events.map((event, index) => (
-
-                    <div
-                      key={index}
-                      className="rounded-xl bg-zinc-900 p-3 text-sm text-zinc-300"
-                    >
-                      {event}
-                    </div>
-
-                  ))}
-
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          {/* RIGHT PANEL */}
-
-          <div className="col-span-3 rounded-2xl border border-zinc-800 p-4">
-
-            <h2 className="mb-4 text-xl font-semibold">
-              Market Impact
+            <h2>
+              Reflection
             </h2>
 
-            <div className="space-y-4">
+            <pre
+              style={{
+                whiteSpace: "pre-wrap"
+              }}
+            >
+              {result.reflection}
+            </pre>
 
-              {/* Sentiment */}
+          </section>
 
-              <div className="rounded-xl bg-zinc-900 p-4">
+          <section
+            style={{
+              marginBottom: "30px"
+            }}
+          >
 
-                <p className="text-zinc-400">
-                  Sentiment
-                </p>
+            <h2>
+              Knowledge Graph
+            </h2>
 
-                <p className="mt-2 text-2xl font-bold text-red-400">
+            <GraphView
+                relationships={graphData}
+              />
 
-                  {data.initial_analysis.sentiment}
+          </section>
 
-                </p>
+          <section
+            style={{
+              marginBottom: "30px"
+            }}
+          >
 
-              </div>
+            <h2>
+              Reasoning Agent
+            </h2>
 
-              {/* Confidence */}
+            <pre
+              style={{
+                whiteSpace: "pre-wrap"
+              }}
+            >
+              {result.reasoning_agent}
+            </pre>
 
-              <div className="rounded-xl bg-zinc-900 p-4">
-
-                <p className="text-zinc-400">
-                  Confidence
-                </p>
-
-                <p className="mt-2 text-2xl font-bold">
-
-                  {(data.initial_analysis.confidence * 100).toFixed(0)}%
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
+          </section>
 
         </div>
-
       )}
 
     </main>

@@ -32,7 +32,8 @@ from agents.news_selection_agent import (
 )
 
 from graph.neo4j_graph import (
-    add_typed_relationship
+    add_typed_relationship,
+    get_graph_data
 )
 
 from graph.retrieval import (
@@ -65,6 +66,13 @@ app.add_middleware(
 def root():
     return {
         "message": "ReflexAlpha Backend Running"
+    }
+
+@app.get("/graph")
+def graph():
+
+    return {
+        "relationships": get_graph_data()
     }
 
 # ----------------------------------------

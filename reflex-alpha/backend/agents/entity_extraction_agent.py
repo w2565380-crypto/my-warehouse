@@ -88,4 +88,23 @@ def run_entity_extraction_agent(headline):
         valid_relationships
     )
 
+# --------------------------------
+# Fallback Relationship Generation
+# --------------------------------
+
+    if len(extracted["relationships"]) == 0:
+
+        entities = extracted["entities"]
+
+        if len(entities) >= 2:
+
+          extracted["relationships"].append({
+
+              "source": entities[0]["name"],
+
+              "relation": "RELATED_TO",
+
+              "target": entities[1]["name"]
+        })
+
     return extracted

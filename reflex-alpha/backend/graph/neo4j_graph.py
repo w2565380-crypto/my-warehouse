@@ -21,7 +21,35 @@ driver = GraphDatabase.driver(
     auth=(USERNAME, PASSWORD)
 )
 
+def get_graph_data():
 
+    query = """
+    MATCH (a)-[r]->(b)
+
+    RETURN
+        a.name AS source,
+        type(r) AS relation,
+        b.name AS target
+    """
+
+    with driver.session() as session:
+
+        result = session.run(query)
+
+        data = []
+
+        for record in result:
+
+            data.append({
+
+                "source": record["source"],
+
+                "relation": record["relation"],
+
+                "target": record["target"]
+            })
+
+        return data
 
 
 def add_typed_relationship(
