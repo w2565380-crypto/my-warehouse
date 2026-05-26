@@ -1,0 +1,91 @@
+.page {
+  min-height: 100vh;
+  background: #020617;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  height: 80px;
+  border-bottom: 1px solid #1e293b;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 32px;
+
+  background: #0f172a;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-top: 4px;
+}
+
+.main {
+  display: grid;
+
+  grid-template-columns: 320px 1fr;
+
+  gap: 24px;
+
+  padding: 24px;
+}
+
+.sidebar {
+  background: #0f172a;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 16px;
+
+  padding: 20px;
+
+  height: calc(100vh - 140px);
+
+  overflow-y: auto;
+}
+
+.panel {
+  background: #0f172a;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 16px;
+
+  padding: 20px;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.logItem {
+  background: #111827;
+
+  border: 1px solid #334155;
+
+  border-radius: 12px;
+
+  padding: 12px;
+
+  margin-bottom: 12px;
+
+  color: #4ade80;
+
+  font-family: monospace;
+
+  font-size: 14px;
+}
+
+.analysisCard {
+  margin-top: 24px;
+}

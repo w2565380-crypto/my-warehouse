@@ -1,0 +1,15 @@
+.html {
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.body {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  background-image: radial-gradient(ellipse at 50% 0%, #0f172a 0%, #020617 70%);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), Arial, sans-serif;
+}

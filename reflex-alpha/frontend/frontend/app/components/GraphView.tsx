@@ -7,6 +7,7 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
+import styles from "./GraphView.module.css";
 
 interface Relationship {
   source: string;
@@ -51,22 +52,7 @@ export default function GraphView({
         y: Math.floor(index / 4) * 150
       },
 
-      style: {
-
-        background: "#111827",
-
-        color: "white",
-
-        border: "1px solid #374151",
-
-        borderRadius: "12px",
-
-        padding: 10,
-
-        width: 160,
-
-        fontSize: 14
-      }
+      className: styles.node
     })
   );
 
@@ -100,16 +86,7 @@ export default function GraphView({
 
   return (
 
-    <div
-      style={{
-        width: "100%",
-        height: "700px",
-        background: "#0f172a",
-        borderRadius: "16px",
-        overflow: "hidden",
-        border: "1px solid #1e293b"
-      }}
-    >
+    <div className={styles.container}>
 
       <ReactFlow
 

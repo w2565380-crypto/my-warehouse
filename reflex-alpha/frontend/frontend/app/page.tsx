@@ -2,6 +2,7 @@
 
 import GraphView from "./components/GraphView";
 import { useState } from "react";
+import styles from "./Home.module.css";
 
 interface AnalysisResult {
   headline: string;
@@ -98,191 +99,137 @@ export default function Home() {
 
   return (
 
-    <main
-      style={{
-        padding: "40px",
-        fontFamily: "Arial",
-        backgroundColor: "#0f172a",
-        minHeight: "100vh",
-        color: "white"
-      }}
-    >
-
-      <h1
-        style={{
-          fontSize: "42px",
-          marginBottom: "20px"
-        }}
-      >
-        ReflexAlpha
-      </h1>
-
-      <button
-        onClick={runAnalysis}
-        disabled={loading}
-        style={{
-          padding: "12px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          marginBottom: "30px",
-          borderRadius: "8px",
-          border: "none",
-          backgroundColor: "#2563eb",
-          color: "white"
-        }}
-      >
-        {loading
-          ? "Agents Running..."
-          : "Run AI Analysis"}
-      </button>
+    <main className={styles.page}>
 
       {/* -------------------------------- */}
-      {/* Agent Thinking Stream */}
+      {/* Header */}
       {/* -------------------------------- */}
 
-      <div
-        style={{
-          background: "#111827",
-          color: "#00ff99",
-          padding: "20px",
-          borderRadius: "10px",
-          marginBottom: "30px",
-          minHeight: "220px",
-          fontFamily: "monospace",
-          border: "1px solid #1f2937"
-        }}
-      >
-
-        <h2
-          style={{
-            marginBottom: "20px"
-          }}
-        >
-          Agent Thinking
-        </h2>
-
-        {thinkingSteps.map(
-          (step, index) => (
-
-            <div
-              key={index}
-              style={{
-                marginBottom: "12px"
-              }}
-            >
-              {step}
-            </div>
-          )
-        )}
-
-      </div>
-
-      {/* -------------------------------- */}
-      {/* Final Result */}
-      {/* -------------------------------- */}
-
-      {result && (
-
+      <header className={styles.header}>
         <div>
+          <h1 className={styles.title}>
+            ReflexAlpha
+          </h1>
+          <p className={styles.subtitle}>
+            Graph-Augmented Financial AI Agent
+          </p>
+        </div>
+        <button
+          onClick={runAnalysis}
+          disabled={loading}
+          className={styles.analyzeButton}
+        >
+          {loading
+            ? "Agents Running..."
+            : "Run AI Analysis"}
+        </button>
+      </header>
 
-          <section
-            style={{
-              marginBottom: "30px"
-            }}
-          >
+      {/* -------------------------------- */}
+      {/* Dashboard Grid */}
+      {/* -------------------------------- */}
 
-            <h2>
-              Selected Headline
-            </h2>
+      <div className={styles.dashboard}>
 
-            <p>
-              {result.headline}
-            </p>
+        {/* Sidebar: Agent Thinking */}
 
-          </section>
+        <aside className={styles.sidebar}>
 
-          <section
-            style={{
-              marginBottom: "30px"
-            }}
-          >
+          <h2 className={styles.sidebarTitle}>
+            Agent Thinking
+          </h2>
 
-            <h2>
-              Initial Analysis
-            </h2>
+          {thinkingSteps.map(
+            (step, index) => (
 
-            <pre
-              style={{
-                whiteSpace: "pre-wrap"
-              }}
-            >
-              {JSON.stringify(
-                result.initial_analysis,
-                null,
-                2
-              )}
-            </pre>
+              <div
+                key={index}
+                className={styles.thinkingStep}
+              >
+                {step}
+              </div>
+            )
+          )}
 
-          </section>
+        </aside>
 
-          <section
-            style={{
-              marginBottom: "30px"
-            }}
-          >
+        {/* Main Content: Results */}
 
-            <h2>
-              Reflection
-            </h2>
+        <div className={styles.content}>
 
-            <pre
-              style={{
-                whiteSpace: "pre-wrap"
-              }}
-            >
-              {result.reflection}
-            </pre>
+          {result && (
+            <>
 
-          </section>
+              <div className={styles.card}>
 
-          <section
-            style={{
-              marginBottom: "30px"
-            }}
-          >
+                <h2 className={styles.cardTitle}>
+                  Selected Headline
+                </h2>
 
-            <h2>
-              Knowledge Graph
-            </h2>
+                <p className={styles.cardText}>
+                  {result.headline}
+                </p>
 
-            <GraphView
-                relationships={graphData}
-              />
+              </div>
 
-          </section>
+              <div className={styles.card}>
 
-          <section
-            style={{
-              marginBottom: "30px"
-            }}
-          >
+                <h2 className={styles.cardTitle}>
+                  Initial Analysis
+                </h2>
 
-            <h2>
-              Reasoning Agent
-            </h2>
+                <pre className={styles.pre}>
+                  {JSON.stringify(
+                    result.initial_analysis,
+                    null,
+                    2
+                  )}
+                </pre>
 
-            <pre
-              style={{
-                whiteSpace: "pre-wrap"
-              }}
-            >
-              {result.reasoning_agent}
-            </pre>
+              </div>
 
-          </section>
+              <div className={styles.card}>
+
+                <h2 className={styles.cardTitle}>
+                  Reflection
+                </h2>
+
+                <pre className={styles.pre}>
+                  {result.reflection}
+                </pre>
+
+              </div>
+
+              <div className={styles.card}>
+
+                <h2 className={styles.cardTitle}>
+                  Knowledge Graph
+                </h2>
+
+                <GraphView
+                    relationships={graphData}
+                  />
+
+              </div>
+
+              <div className={styles.card}>
+
+                <h2 className={styles.cardTitle}>
+                  Reasoning Agent
+                </h2>
+
+                <pre className={styles.pre}>
+                  {result.reasoning_agent}
+                </pre>
+
+              </div>
+
+            </>
+          )}
 
         </div>
-      )}
+
+      </div>
 
     </main>
   );
