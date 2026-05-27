@@ -1,5 +1,14 @@
 # ReflexAlpha
 
+![ReflexAlpha Dashboard](assets/Dashboard.png)
+
+![ReflexAlpha Dashboard](assets/Dashboard2.png)
+
+![Agent Thinking Flow](assets/Agent_Thinking.png)
+
+![Neo4j Knowledge Graph](assets/Knowledge_Graph.png)
+
+
 <div align="center">
 
 **多智能体金融推理系统** &nbsp;|&nbsp; Multi-Agent Financial Reasoning Engine
